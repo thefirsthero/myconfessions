@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "confessions-e4a11",
+    "prod": "confessions-e4a11"
+  },
+  "targets": {},
+  "etags": {}
+}

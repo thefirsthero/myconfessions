@@ -33,7 +33,7 @@ spec:
       serviceAccountName: firebase-adminsdk-xv5tv@confessions-e4a11.iam.gserviceaccount.com
       containers:
       - name: api-myconfessions-imgproc-confessing-1
-        image: thefirsthero/api-myconfessions-imgproc-confessing:1.0.0
+        image: thefirsthero/api-myconfessions-imgproc-confessing:1.0.1
         ports:
         - name: http1
           containerPort: 8000

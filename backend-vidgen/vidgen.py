@@ -37,6 +37,12 @@ import msg
 
 HOME = os.getcwd()
 
+# Create necessary folders:
+if not os.path.isdir('trash'):
+    os.mkdir('trash')
+if not os.path.isdir('output'):
+    os.mkdir('output')
+
 # Logging
 if not os.path.isdir('log'):
     os.mkdir('log')
@@ -137,7 +143,7 @@ async def main() -> bool:
             series = video['series']
             part = video['part']
             outro = video['outro']
-            path = video['path']
+            path = 'trash/'
             text = video['text']
 
             req_text, filename = create_full_text(
@@ -377,6 +383,7 @@ def create_full_text(path: str = '', series: str = '', part: int = 1, text: str 
 
     """
     req_text = f"{series} Part {part}.\n{text}\n{outro}" # This line had the series, part and then the text & outro
+    # req_text = f"Confessions.\n{text}\n{outro}" # This line had the series, part and then the text & outro
     # req_text = f"{text}\n{outro}" # This line removes the series & part, it's just the text & outro now
     series = series.replace(' ', '_')
     filename = f"{path}{os.sep}{series}{os.sep}{series}_{part}.mp3"

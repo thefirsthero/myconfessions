@@ -53,7 +53,7 @@ def store_videos_in_firebase():
 
     return True
 
-@app.post("/generate-videos/")
+@app.get("/generate-videos/")
 async def generate_and_store_videos():
     if run_populate_video_json() and generate_videos() and store_videos_in_firebase():
         return JSONResponse(content={"message": "Videos generated and stored in Firebase"}, status_code=200)

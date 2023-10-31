@@ -180,7 +180,6 @@ async def process_images():
                     "series": series,
                     "part": part,
                     "outro": "Visit www.myconfessions.co.za to anonymously confess",
-                    "path": image_local_path,  # Use the local path of the downloaded image
                     "text": cleaned_text
                 })
 
@@ -287,4 +286,7 @@ async def delete_images():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
+# Healthcheck Endpoint
+@app.get("/healthcheck")
+async def healthcheck():
+    return {"status": "ok"}
