@@ -234,6 +234,11 @@ async def delete_image(filename: str):
             found = True
             image_data = image.to_dict()
 
+            # Decrement the count for the deleted image's filename
+            original_filename = image_data.get('filename')
+            if original_filename in uploaded_filenames:
+                uploaded_filenames[original_filename] -= 1
+
             # Delete the document in Firestore
             image.reference.delete()
 
@@ -250,10 +255,14 @@ async def delete_image(filename: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# API endpoint to delete all images stored on the server
+
+# API endpoint to delete all images stored on the server and clear the uploaded_filenames map
 @app.delete("/delete-images/")
 async def delete_images():
     try:
+        # Clear the entire uploaded_filenames map
+        uploaded_filenames.clear()
+
         # Get a reference to the Firestore collection
         db = firestore.client()
         images_ref = db.collection('images')
@@ -279,12 +288,13 @@ async def delete_images():
                 blob.delete()
 
         if images_exist:
-            return {"message": "All images deleted successfully"}
+            return {"message": "All images deleted successfully, and the uploaded_filenames map is cleared"}
         else:
-            return {"message": "No images found to delete"}
+            return {"message": "No images found to delete, and the uploaded_filenames map is cleared"}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 # Healthcheck Endpoint
 @app.get("/healthcheck")
