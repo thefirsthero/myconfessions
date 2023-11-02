@@ -72,7 +72,7 @@ async def addConfession(confession_obj: Confession):
         new_confession = confessions.add(confession_obj.dict())
         return {'status': 200, 'message': 'Confession added successfully'}
     except Exception as e:
-        return {'status': 500, 'error': str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Import the necessary modules
 from collections import defaultdict
@@ -96,7 +96,7 @@ async def upload_images(images: List[UploadFile]):
 
                 # Check if the original filename has been uploaded before
                 if uploaded_filenames[original_filename] >= 1:
-                    raise Exception(f"Image '{original_filename}' has already been uploaded.")
+                    raise HTTPException(status_code=400, detail=f"Image '{original_filename}' has already been uploaded.")
 
                 # Increment the count for the original filename
                 uploaded_filenames[original_filename] += 1
@@ -124,12 +124,14 @@ async def upload_images(images: List[UploadFile]):
                 # Append the image URL to the list
                 image_urls.append(image_url)
             else:
-                # Raise an exception if the file is not an image
-                raise Exception(f"{image.filename} is not an image file")
+                raise HTTPException(status_code=400, detail=f"{image.filename} is not an image file")
 
         return {'status': 200, 'message': 'Images uploaded successfully', 'image_urls': image_urls}
+    except HTTPException as e:
+        raise e
     except Exception as e:
-        return {'status': 500, 'error': str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 # API endpoint to return the OCR text of the images uploaded
@@ -250,8 +252,9 @@ async def delete_image(filename: str):
         if found:
             return {"message": f"Image '{filename}' deleted successfully from Firestore and Storage"}
         else:
-            return {"message": f"Image '{filename}' not found in the database"}
-
+            raise HTTPException(status_code=404, detail=f"Image '{filename}' not found in the database")
+    except HTTPException as e:
+        raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -290,8 +293,9 @@ async def delete_images():
         if images_exist:
             return {"message": "All images deleted successfully, and the uploaded_filenames map is cleared"}
         else:
-            return {"message": "No images found to delete, and the uploaded_filenames map is cleared"}
-
+            raise HTTPException(status_code=404, detail="No images found to delete")
+    except HTTPException as e:
+        raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
