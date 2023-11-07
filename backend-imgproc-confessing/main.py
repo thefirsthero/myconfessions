@@ -299,6 +299,87 @@ async def delete_images():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# API endpoint to generate a MyConfessions.json for www.myconfessions.co.za confessions
+# Import necessary modules
+from fastapi import File, HTTPException
+from fastapi.responses import FileResponse
+import tempfile
+import json
+
+# Define the behavior for the /generate-json route with the GET method
+@app.get("/myconfessions-json/")
+async def myconfessions_json():
+    try:
+        # Get a reference to the Firestore collection
+        db = firestore.client()
+        confessions_ref = db.collection('confessions')
+
+        # Retrieve all confession documents from Firestore and sort by the 'id' field
+        confessions = confessions_ref.stream()
+
+        # Initialize a list to store the generated JSON data
+        generated_json = []
+
+        # Define common values for series, outro, and path
+        series = "Your Confessions"
+        outro = "Visit www.myconfessions.co.za to anonymously confess"
+        path = "/content/drive/MyDrive/Colab Notebooks/AI_Bots/ContentGen/Whisper-Tiktok/code/Trash"
+
+        # Create a function to get the 'id' from a confession document
+        def get_id(confession_data):
+            try:
+                return int(confession_data.get('id'))
+            except (ValueError, TypeError):
+                return None
+        
+         # Function to append location with proper punctuation
+        def append_location(text, location):
+            if text and text[-1] in ('.', '!', '?'):
+                return f"{text} {location}"
+            else:
+                return f"{text}. {location}"
+
+        # Filter out documents without a valid integer 'id' and sort by 'id'
+        valid_confessions = sorted((confession_data for confession_data in confessions if get_id(confession_data) is not None),
+                                   key=lambda c: get_id(c))
+
+        for confession_data in valid_confessions:
+            # Extract 'id' and 'confession' fields from the confession document
+            confession_id = get_id(confession_data)
+            confession_text = confession_data.get('confession').strip()
+
+            # Append 'location' field to the end of the text with a full stop
+            location = confession_data.get('location')
+
+            # Append 'location' to the text with proper punctuation
+            full_text = append_location(confession_text, location)
+
+            # Create a dictionary for the confession data
+            confession_dict = {
+                "series": series,
+                "part": str(confession_id),
+                "outro": outro,
+                "path": path,
+                "text": full_text.strip()
+            }
+
+            # Add the confession data to the generated JSON list
+            generated_json.append(confession_dict)
+
+        # Create a temporary directory to store the JSON file
+        temp_dir = tempfile.mkdtemp(prefix='json_generation_')
+        json_file_path = os.path.join(temp_dir, 'generated_confessions.json')
+
+        # Write the generated JSON data to the JSON file
+        with open(json_file_path, 'w', encoding='utf-8') as json_file:
+            json.dump(generated_json, json_file, ensure_ascii=False, indent=4)
+
+        # Return the generated JSON file as a downloadable response
+        response = FileResponse(json_file_path, headers={"Content-Disposition": "attachment; filename=MyConfessions.json"})
+
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Healthcheck Endpoint
 @app.get("/healthcheck")
