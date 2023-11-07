@@ -63,3 +63,8 @@ async def generate_and_store_videos():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# Healthcheck Endpoint
+@app.get("/healthcheck")
+async def healthcheck():
+    return {"status": "ok"}

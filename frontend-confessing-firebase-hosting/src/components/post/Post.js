@@ -59,11 +59,12 @@ function Post() {
                     <Form onSubmit={handleSubmit}>
                         <Form.Group as={Row} controlId="inputConfession" className="mb-3">
                             <Form.Label column sm={2}>
-                                Enter Confession:
+                                Confession:
                             </Form.Label>
                             <Col sm={10}>
                                 <Form.Control
                                     as="textarea"
+                                    placeholder="Enter Confession"
                                     rows={5}
                                     value={confession}
                                     onChange={(e) => setConfession(e.target.value)}
@@ -74,12 +75,12 @@ function Post() {
 
                         <Form.Group as={Row} controlId="city">
                             <Form.Label column sm={2}>
-                                Enter city name:
+                                Location:
                             </Form.Label>
                             <Col sm={10}>
                                 <Form.Control
                                     type="text"
-                                    placeholder="Location"
+                                    placeholder="Enter City Name"
                                     value={city}
                                     onChange={(e) => setCity(e.target.value)}
                                     required
